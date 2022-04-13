@@ -51,4 +51,6 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	uint32_t textureHandle_ = 0;
+	Sprite* sprite_ = nullptr;
 };
