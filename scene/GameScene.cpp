@@ -6,7 +6,10 @@ using namespace DirectX;
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { delete sprite_; }
+GameScene::~GameScene() {
+	delete sprite_;
+	delete model_;
+}
 
 void GameScene::Initialize() {
 
@@ -17,9 +20,22 @@ void GameScene::Initialize() {
 
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	sprite_ = Sprite::Create(textureHandle_, {100, 50});
+	model_ = Model::Create();
+
+	worldTransform_.Initialize();
+	viewProjection_.Initialize();
 }
 
-void GameScene::Update() {}
+void GameScene::Update() { 
+	
+	//スプライトの座標を取得
+	XMFLOAT2 postion = sprite_->GetPosition();
+	//座標を移動
+	postion.x += 2.0f;
+	postion.y += 1.0f;
+	//移動した座標をスプライトに反映
+	sprite_->SetPosition(postion);
+}
 
 void GameScene::Draw() {
 
@@ -47,6 +63,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

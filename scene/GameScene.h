@@ -53,4 +53,9 @@ class GameScene {
 	/// </summary>
 	uint32_t textureHandle_ = 0;
 	Sprite* sprite_ = nullptr;
+	Model* model_ = nullptr;
+	//ワールドトランスフォーム
+	WorldTransform worldTransform_;
+	//ビュープロジェクション
+	ViewProjection viewProjection_;
 };
