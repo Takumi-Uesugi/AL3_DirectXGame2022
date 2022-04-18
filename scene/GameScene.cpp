@@ -35,6 +35,11 @@ void GameScene::Update() {
 	postion.y += 1.0f;
 	//移動した座標をスプライトに反映
 	sprite_->SetPosition(postion);
+
+	value_++;
+	std::string strDebug = std::string("Value:") + std::to_string(value_);
+
+	debugText_->Print(strDebug, 50, 50);
 }
 
 void GameScene::Draw() {

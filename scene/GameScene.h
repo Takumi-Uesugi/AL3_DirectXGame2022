@@ -58,4 +58,6 @@ class GameScene {
 	WorldTransform worldTransform_;
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
+
+	uint32_t value_ = 0;
 };
