@@ -21,13 +21,22 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("mario.jpg");
 	sprite_ = Sprite::Create(textureHandle_, {100, 50});
 	model_ = Model::Create();
-
+	/*
+	worldTransform_.scale_ = {5.0f, 5.0f, 5.0f};
+	worldTransform_.rotation_ = {0.0f, XM_PI/4.0f, 0.0f};
+	worldTransform_.translation_ = {0.0f, 10.0f, 0.0f};
+	*/
+	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
+	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
+
+	soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
+
+	voiceHandle_ = audio_->PlayWave(soundDataHandle_, true, 0.1f);
 }
 
 void GameScene::Update() { 
-	
 	//スプライトの座標を取得
 	XMFLOAT2 postion = sprite_->GetPosition();
 	//座標を移動
@@ -40,6 +49,10 @@ void GameScene::Update() {
 	std::string strDebug = std::string("Value:") + std::to_string(value_);
 
 	debugText_->Print(strDebug, 50, 50);
+
+	if (input_->TriggerKey(DIK_SPACE)) {
+		audio_->StopWave(voiceHandle_);
+	}
 }
 
 void GameScene::Draw() {
@@ -81,6 +94,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	
 	sprite_->Draw();
 
 	// デバッグテキストの描画
