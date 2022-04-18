@@ -58,9 +58,4 @@ class GameScene {
 	WorldTransform worldTransform_;
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
-
-	uint32_t value_ = 0;
-
-	uint32_t soundDataHandle_ = 0;
-	uint32_t voiceHandle_ = 0;
 };
