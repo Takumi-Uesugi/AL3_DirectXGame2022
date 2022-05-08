@@ -60,4 +60,16 @@ class GameScene {
 	ViewProjection viewProjection_;
 	//カメラ上方向の角度
 	float viewAngle_ = 0.0f;
+	//パーツID
+	enum PartId {
+		Root,
+		Spine,
+		Chest,
+		Head,
+		ArmL,
+		ArmR,
+		Hip,
+		LegL,
+		LegR
+	};
 };
