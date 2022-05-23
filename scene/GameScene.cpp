@@ -6,7 +6,10 @@ using namespace DirectX;
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete spriteBG_;
+	delete modelStage_;
+}
 
 void GameScene::Initialize() {
 
@@ -14,6 +17,20 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+
+	textureHandleBG_ = TextureManager::Load("bg.jpg");
+	spriteBG_ = Sprite::Create(textureHandleBG_, {0, 0});
+
+	viewProjection_.eye = {0, 1, -6};
+	viewProjection_.target = {0, 1, 0};
+	viewProjection_.Initialize();
+
+	textureHandleStage_ = TextureManager::Load("stage.jpg");
+	modelStage_ = Model::Create();
+	worldTransformStage_.translation_ = {0, -1.5f, 0};
+	worldTransformStage_.scale_ = {4.5f, 1, 40};
+	worldTransformStage_.Initialize();
+
 }
 
 void GameScene::Update() {}
@@ -30,6 +47,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
+	spriteBG_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -44,7 +62,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
+	modelStage_->Draw(worldTransformStage_, viewProjection_, textureHandleStage_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

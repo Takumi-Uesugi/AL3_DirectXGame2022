@@ -51,4 +51,12 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	uint32_t textureHandleBG_ = 0;
+	Sprite* spriteBG_ = nullptr;
+
+	ViewProjection viewProjection_;
+
+	uint32_t textureHandleStage_ = 0;
+	Model* modelStage_ = nullptr;
+	WorldTransform worldTransformStage_;
 };
