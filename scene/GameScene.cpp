@@ -31,9 +31,30 @@ void GameScene::Initialize() {
 	worldTransformStage_.scale_ = {4.5f, 1, 40};
 	worldTransformStage_.Initialize();
 
+	textureHandlePlayer_ = TextureManager::Load("player.png");
+	modelPlayer_ = Model::Create();
+	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
+	worldTransformPlayer_.Initialize();
 }
 
-void GameScene::Update() {}
+void GameScene::Update() { PlayerUpdate(); }
+
+void GameScene::PlayerUpdate()
+{
+	if (input_->PushKey(DIK_RIGHT)) {
+		worldTransformPlayer_.translation_.x += 0.1f;
+	}
+	if (input_->PushKey(DIK_LEFT)) {
+		worldTransformPlayer_.translation_.x -= 0.1f;
+	}
+	if (worldTransformPlayer_.translation_.x > 4.0f) {
+		worldTransformPlayer_.translation_.x = 4.0f;
+	}
+	if (worldTransformPlayer_.translation_.x < -4.0f) {
+		worldTransformPlayer_.translation_.x = -4.0f;
+	}
+	worldTransformPlayer_.UpdateMatrix();
+}
 
 void GameScene::Draw() {
 
@@ -63,6 +84,8 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	modelStage_->Draw(worldTransformStage_, viewProjection_, textureHandleStage_);
+	modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
