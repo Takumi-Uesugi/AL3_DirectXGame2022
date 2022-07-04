@@ -9,6 +9,8 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete spriteBG_;
 	delete modelStage_;
+	delete modelPlayer_;
+	delete modelBeam_;
 }
 
 void GameScene::Initialize() {
@@ -35,9 +37,18 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::Create();
 	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformPlayer_.Initialize();
+
+	textureHnadleBeam_ = TextureManager::Load("beam.png");
+	modelBeam_ = Model::Create();
+	worldTransformBeam_.scale_ = {0.33f, 0.33f, 0.33f};
+	worldTransformBeam_.Initialize();
 }
 
-void GameScene::Update() { PlayerUpdate(); }
+void GameScene::Update()
+{
+	PlayerUpdate();
+	BeamUpdate();
+}
 
 void GameScene::PlayerUpdate()
 {
@@ -53,7 +64,33 @@ void GameScene::PlayerUpdate()
 	if (worldTransformPlayer_.translation_.x < -4.0f) {
 		worldTransformPlayer_.translation_.x = -4.0f;
 	}
+
 	worldTransformPlayer_.UpdateMatrix();
+}
+
+void GameScene::BeamUpdate() 
+{
+	BeamMove();
+	BeamBorn();
+	
+	worldTransformBeam_.UpdateMatrix();
+}
+
+void GameScene::BeamMove() 
+{
+	worldTransformBeam_.translation_.z += 2.0f;
+	worldTransformBeam_.rotation_.x += 0.1f;
+	if (worldTransformBeam_.translation_.z >= 40) {
+		beamFlag = 0;
+	}
+}
+
+void GameScene::BeamBorn() {
+	if (input_->PushKey(DIK_SPACE)) {
+		worldTransformBeam_.translation_.x = worldTransformPlayer_.translation_.x;
+		worldTransformBeam_.translation_.z = 0;
+		beamFlag = 1;
+	}
 }
 
 void GameScene::Draw() {
@@ -85,6 +122,11 @@ void GameScene::Draw() {
 	/// </summary>
 	modelStage_->Draw(worldTransformStage_, viewProjection_, textureHandleStage_);
 	modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+	if (beamFlag == 1) 
+	{
+		modelBeam_->Draw(worldTransformBeam_, viewProjection_, textureHnadleBeam_);
+	}
+	
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

@@ -38,6 +38,9 @@ class GameScene {
 	void Update();
 
 	void PlayerUpdate();
+	void BeamUpdate();
+	void BeamMove();
+	void BeamBorn();
 
 	/// <summary>
 	/// 描画
@@ -53,6 +56,8 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	
+	int beamFlag = 0;
 	uint32_t textureHandleBG_ = 0;
 	Sprite* spriteBG_ = nullptr;
 
@@ -64,4 +69,7 @@ class GameScene {
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;
+	uint32_t textureHnadleBeam_ = 0;
+	Model* modelBeam_ = nullptr;
+	WorldTransform worldTransformBeam_;
 };
