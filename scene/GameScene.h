@@ -45,6 +45,10 @@ class GameScene {
 	void EnemyMove();
 	void EnemyBorn();
 
+	void Collision();
+	void CollisionPlayerEnemy();
+	void CollisionBeamEnemy();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -59,7 +63,9 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	
+	int playerLife = 3;
+	int gameScore = 0;
+
 	uint32_t textureHandleBG_ = 0;
 	Sprite* spriteBG_ = nullptr;
 

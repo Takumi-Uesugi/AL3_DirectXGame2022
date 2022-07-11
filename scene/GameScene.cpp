@@ -57,78 +57,8 @@ void GameScene::Update()
 	PlayerUpdate();
 	BeamUpdate();
 	EnemyUpdate();
-}
-
-void GameScene::PlayerUpdate()
-{
-	if (input_->PushKey(DIK_RIGHT)) {
-		worldTransformPlayer_.translation_.x += 0.1f;
-	}
-	if (input_->PushKey(DIK_LEFT)) {
-		worldTransformPlayer_.translation_.x -= 0.1f;
-	}
-	if (worldTransformPlayer_.translation_.x > 4.0f) {
-		worldTransformPlayer_.translation_.x = 4.0f;
-	}
-	if (worldTransformPlayer_.translation_.x < -4.0f) {
-		worldTransformPlayer_.translation_.x = -4.0f;
-	}
-
-	worldTransformPlayer_.UpdateMatrix();
-}
-
-void GameScene::BeamUpdate() 
-{
-	if (beamFlag == 1) {
-		BeamMove();
-	}
-	BeamBorn();
 	
-	worldTransformBeam_.UpdateMatrix();
-}
-
-void GameScene::BeamMove() 
-{
-	worldTransformBeam_.translation_.z += 2.0f;
-	worldTransformBeam_.rotation_.x += 0.1f;
-	if (worldTransformBeam_.translation_.z >= 40) {
-		beamFlag = 0;
-	}
-}
-
-void GameScene::BeamBorn() {
-	if (input_->PushKey(DIK_SPACE)) {
-		worldTransformBeam_.translation_.x = worldTransformPlayer_.translation_.x;
-		worldTransformBeam_.translation_.z = 0;
-		beamFlag = 1;
-	}
-}
-
-void GameScene::EnemyUpdate() {
-	if (enemyFlag == 1) {
-		EnemyMove();
-	}
-	EnemyBorn();
-	worldTransformEnemy_.UpdateMatrix();
-}
-
-void GameScene::EnemyMove() {
-	worldTransformEnemy_.translation_.z -= 0.5f;
-	worldTransformEnemy_.rotation_.x -= 0.1f;
-	if (worldTransformEnemy_.translation_.z  < -5) {
-		enemyFlag = 0;
-	}
-}
-
-void GameScene::EnemyBorn() {
-	if (enemyFlag == 0) {
-		int x = rand() % 80;
-		float x2 = (float)x / 10 - 4;
-		worldTransformEnemy_.translation_.x = x2;
-		worldTransformEnemy_.translation_.z = 40;
-		worldTransformEnemy_.rotation_.x -= 0;
-		enemyFlag = 1;
-	}
+	Collision();
 }
 
 void GameScene::Draw() {
@@ -178,6 +108,11 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	char str[100];
+	sprintf_s(str, "SCORE %d", gameScore);
+	debugText_->Print(str, 200, 10, 2);
+	sprintf_s(str, "LIFE %d", playerLife);
+	debugText_->Print(str, 800, 10, 2);
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -186,4 +121,102 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+
+void GameScene::PlayerUpdate() {
+	if (input_->PushKey(DIK_RIGHT)) {
+		worldTransformPlayer_.translation_.x += 0.1f;
+	}
+	if (input_->PushKey(DIK_LEFT)) {
+		worldTransformPlayer_.translation_.x -= 0.1f;
+	}
+	if (worldTransformPlayer_.translation_.x > 4.0f) {
+		worldTransformPlayer_.translation_.x = 4.0f;
+	}
+	if (worldTransformPlayer_.translation_.x < -4.0f) {
+		worldTransformPlayer_.translation_.x = -4.0f;
+	}
+
+	worldTransformPlayer_.UpdateMatrix();
+}
+
+void GameScene::BeamUpdate() {
+	if (beamFlag == 1) {
+		BeamMove();
+	}
+	BeamBorn();
+
+	worldTransformBeam_.UpdateMatrix();
+}
+
+void GameScene::BeamMove() {
+	worldTransformBeam_.translation_.z += 2.0f;
+	worldTransformBeam_.rotation_.x += 0.1f;
+	if (worldTransformBeam_.translation_.z >= 40) {
+		beamFlag = 0;
+	}
+}
+
+void GameScene::BeamBorn() {
+	if (input_->PushKey(DIK_SPACE)) {
+		worldTransformBeam_.translation_.x = worldTransformPlayer_.translation_.x;
+		worldTransformBeam_.translation_.z = 0;
+		beamFlag = 1;
+	}
+}
+
+void GameScene::EnemyUpdate() {
+	if (enemyFlag == 1) {
+		EnemyMove();
+	}
+	EnemyBorn();
+	worldTransformEnemy_.UpdateMatrix();
+}
+
+void GameScene::EnemyMove() {
+	worldTransformEnemy_.translation_.z -= 0.5f;
+	worldTransformEnemy_.rotation_.x -= 0.1f;
+	if (worldTransformEnemy_.translation_.z < -5) {
+		enemyFlag = 0;
+	}
+}
+
+void GameScene::EnemyBorn() {
+	if (enemyFlag == 0) {
+		int x = rand() % 80;
+		float x2 = (float)x / 10 - 4;
+		worldTransformEnemy_.translation_.x = x2;
+		worldTransformEnemy_.translation_.z = 40;
+		worldTransformEnemy_.rotation_.x -= 0;
+		enemyFlag = 1;
+	}
+}
+
+void GameScene::Collision() {
+	CollisionPlayerEnemy();
+	CollisionBeamEnemy();
+}
+
+void GameScene::CollisionPlayerEnemy() {
+	if (enemyFlag == 1) {
+		float dx = abs(worldTransformPlayer_.translation_.x - worldTransformEnemy_.translation_.x);
+		float dz = abs(worldTransformPlayer_.translation_.z - worldTransformEnemy_.translation_.z);
+		if (dx < 1 && dz < 1) {
+			enemyFlag = 0;
+			playerLife--;
+		}
+	}
+}
+
+void GameScene::CollisionBeamEnemy() {
+	if (beamFlag == 1 && enemyFlag == 1) {
+		float dx = abs(worldTransformBeam_.translation_.x - worldTransformEnemy_.translation_.x);
+		float dz = abs(worldTransformBeam_.translation_.z - worldTransformEnemy_.translation_.z);
+		if (dx < 1 && dz < 1) {
+			beamFlag = 0;
+			enemyFlag = 0;
+			gameScore++;
+		}
+	}
 }
