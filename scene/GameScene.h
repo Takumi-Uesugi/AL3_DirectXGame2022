@@ -41,6 +41,9 @@ class GameScene {
 	void BeamUpdate();
 	void BeamMove();
 	void BeamBorn();
+	void EnemyUpdate();
+	void EnemyMove();
+	void EnemyBorn();
 
 	/// <summary>
 	/// 描画
@@ -57,7 +60,6 @@ class GameScene {
 	/// ゲームシーン用
 	/// </summary>
 	
-	int beamFlag = 0;
 	uint32_t textureHandleBG_ = 0;
 	Sprite* spriteBG_ = nullptr;
 
@@ -69,7 +71,12 @@ class GameScene {
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;
+	int beamFlag = 0;
 	uint32_t textureHnadleBeam_ = 0;
 	Model* modelBeam_ = nullptr;
 	WorldTransform worldTransformBeam_;
+	int enemyFlag = 1;
+	uint32_t textureHandleEnemy_ = 0;
+	Model* modelEnemy_ = nullptr;
+	WorldTransform worldTransformEnemy_;
 };

@@ -1,5 +1,6 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
+#include <time.h>
 #include <cassert>
 
 using namespace DirectX;
@@ -11,9 +12,11 @@ GameScene::~GameScene() {
 	delete modelStage_;
 	delete modelPlayer_;
 	delete modelBeam_;
+	delete modelEnemy_; 
 }
 
 void GameScene::Initialize() {
+	srand((unsigned int)time(NULL));
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
@@ -42,12 +45,18 @@ void GameScene::Initialize() {
 	modelBeam_ = Model::Create();
 	worldTransformBeam_.scale_ = {0.33f, 0.33f, 0.33f};
 	worldTransformBeam_.Initialize();
+
+	textureHandleEnemy_ = TextureManager::Load("enemy.png");
+	modelEnemy_ = Model::Create();
+	worldTransformEnemy_.scale_ = {0.5f, 0.5f, 0.5f};
+	worldTransformEnemy_.Initialize();
 }
 
 void GameScene::Update()
 {
 	PlayerUpdate();
 	BeamUpdate();
+	EnemyUpdate();
 }
 
 void GameScene::PlayerUpdate()
@@ -70,7 +79,9 @@ void GameScene::PlayerUpdate()
 
 void GameScene::BeamUpdate() 
 {
-	BeamMove();
+	if (beamFlag == 1) {
+		BeamMove();
+	}
 	BeamBorn();
 	
 	worldTransformBeam_.UpdateMatrix();
@@ -90,6 +101,33 @@ void GameScene::BeamBorn() {
 		worldTransformBeam_.translation_.x = worldTransformPlayer_.translation_.x;
 		worldTransformBeam_.translation_.z = 0;
 		beamFlag = 1;
+	}
+}
+
+void GameScene::EnemyUpdate() {
+	if (enemyFlag == 1) {
+		EnemyMove();
+	}
+	EnemyBorn();
+	worldTransformEnemy_.UpdateMatrix();
+}
+
+void GameScene::EnemyMove() {
+	worldTransformEnemy_.translation_.z -= 0.5f;
+	worldTransformEnemy_.rotation_.x -= 0.1f;
+	if (worldTransformEnemy_.translation_.z  < -5) {
+		enemyFlag = 0;
+	}
+}
+
+void GameScene::EnemyBorn() {
+	if (enemyFlag == 0) {
+		int x = rand() % 80;
+		float x2 = (float)x / 10 - 4;
+		worldTransformEnemy_.translation_.x = x2;
+		worldTransformEnemy_.translation_.z = 40;
+		worldTransformEnemy_.rotation_.x -= 0;
+		enemyFlag = 1;
 	}
 }
 
@@ -126,6 +164,7 @@ void GameScene::Draw() {
 	{
 		modelBeam_->Draw(worldTransformBeam_, viewProjection_, textureHnadleBeam_);
 	}
+	modelEnemy_->Draw(worldTransformEnemy_, viewProjection_, textureHandleEnemy_);
 	
 
 	// 3Dオブジェクト描画後処理
