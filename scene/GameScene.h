@@ -37,6 +37,11 @@ class GameScene {
 	/// </summary>
 	void Update();
 
+	void GamePlayUpdate(); //ゲームプレイ更新
+	void GamePlayDraw3D(); //ゲームプレイ3D描画
+	void GamePlayDraw2DBack(); //ゲームプレイ背景2D描画
+	void GamePlayDraw2DNear(); //ゲームプレイ近景2D描画
+
 	void PlayerUpdate();
 	void BeamUpdate();
 	void BeamMove();
@@ -63,6 +68,8 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	int sceneMode_ = 0;
+
 	int playerLife = 3;
 	int gameScore = 0;
 

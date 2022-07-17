@@ -52,13 +52,14 @@ void GameScene::Initialize() {
 	worldTransformEnemy_.Initialize();
 }
 
-void GameScene::Update()
-{
-	PlayerUpdate();
-	BeamUpdate();
-	EnemyUpdate();
-	
-	Collision();
+void GameScene::Update() {
+	switch (sceneMode_) {
+	case 0:
+		GamePlayUpdate();
+		break;
+	default:
+		break;
+	}
 }
 
 void GameScene::Draw() {
@@ -73,7 +74,13 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	spriteBG_->Draw();
+	switch (sceneMode_) {
+	case 0:
+		GamePlayDraw2DBack();
+		break;
+	default:
+		break;
+	}
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -88,14 +95,13 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	modelStage_->Draw(worldTransformStage_, viewProjection_, textureHandleStage_);
-	modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
-	if (beamFlag == 1) 
-	{
-		modelBeam_->Draw(worldTransformBeam_, viewProjection_, textureHnadleBeam_);
+	switch (sceneMode_) {
+	case 0:
+		GamePlayDraw3D();
+		break;
+	default:
+		break;
 	}
-	modelEnemy_->Draw(worldTransformEnemy_, viewProjection_, textureHandleEnemy_);
-	
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -108,11 +114,13 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	char str[100];
-	sprintf_s(str, "SCORE %d", gameScore);
-	debugText_->Print(str, 200, 10, 2);
-	sprintf_s(str, "LIFE %d", playerLife);
-	debugText_->Print(str, 800, 10, 2);
+	switch (sceneMode_) {
+	case 0:
+		GamePlayDraw2DNear();
+		break;
+	default:
+		break;
+	}
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
@@ -123,6 +131,28 @@ void GameScene::Draw() {
 #pragma endregion
 }
 
+void GameScene::GamePlayUpdate() {
+	PlayerUpdate();
+	EnemyUpdate();
+	BeamUpdate();
+	Collision();
+}
+void GameScene::GamePlayDraw3D() {
+	modelStage_->Draw(worldTransformStage_, viewProjection_, textureHandleStage_);
+	modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+	modelEnemy_->Draw(worldTransformEnemy_, viewProjection_, textureHandleEnemy_);
+	if (beamFlag == 1) {
+		modelBeam_->Draw(worldTransformBeam_, viewProjection_, textureHnadleBeam_);
+	}
+}
+void GameScene::GamePlayDraw2DBack() { spriteBG_->Draw(); }
+void GameScene::GamePlayDraw2DNear() {
+	char str[100];
+	sprintf_s(str, "SCORE %d", gameScore);
+	debugText_->Print(str, 200, 10, 2);
+	sprintf_s(str, "LIFE %d", playerLife);
+	debugText_->Print(str, 800, 10, 2);
+}
 
 void GameScene::PlayerUpdate() {
 	if (input_->PushKey(DIK_RIGHT)) {
