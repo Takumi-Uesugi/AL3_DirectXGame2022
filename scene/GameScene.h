@@ -50,6 +50,8 @@ class GameScene {
 	void EnemyUpdate();
 	void EnemyMove();
 	void EnemyBorn();
+	void EnemyJump();
+	void StageUpdate();
 
 	void Collision();
 	void CollisionPlayerEnemy();
@@ -75,22 +77,20 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	const int ENEMY_MAX = 10;
+	const int BEAM_MAX = 10;
+	const int STAGE_CUTS = 20;
+	
 	int sceneMode_ = 1;
 	int gameTime_ = 0;
 	int beamtimer_ = 0;
-
-	uint32_t soundDataHandleTitleBGM_ = 0;
-	uint32_t soundDataHandleGamePlayBGM_ = 0;
-	uint32_t soundDataHandleGameOverBGM_ = 0;
-	uint32_t soundDataHandleEnemyHitSE_ = 0;
-	uint32_t soundDataHandlePlayerHitSE_ = 0;
-	uint32_t voiceHandleBGM_ = 0;
 
 	int playerLife = 3;
 	int gameScore = 0;
 	int beamFlag[10] = {};
 	int enemyFlag[10] = {};
 	float enemySpeed[10] = {};
+	float enemyJumpSpeed[10] = {};
 
 	uint32_t textureHandleBG_ = 0;
 	Sprite* spriteBG_ = nullptr;
@@ -99,7 +99,7 @@ class GameScene {
 
 	uint32_t textureHandleStage_ = 0;
 	Model* modelStage_ = nullptr;
-	WorldTransform worldTransformStage_;
+	WorldTransform worldTransformStage_[20];
 
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
@@ -119,4 +119,11 @@ class GameScene {
 	Sprite* spriteEnter_ = nullptr;
 	uint32_t textureHandleGameover_ = 0;
 	Sprite* spriteGameover_ = nullptr;
+
+	uint32_t soundDataHandleTitleBGM_ = 0;
+	uint32_t soundDataHandleGamePlayBGM_ = 0;
+	uint32_t soundDataHandleGameOverBGM_ = 0;
+	uint32_t soundDataHandleEnemyHitSE_ = 0;
+	uint32_t soundDataHandlePlayerHitSE_ = 0;
+	uint32_t voiceHandleBGM_ = 0;
 };

@@ -31,11 +31,13 @@ void GameScene::Initialize() {
 	viewProjection_.target = {0, 1, 0};
 	viewProjection_.Initialize();
 
-	textureHandleStage_ = TextureManager::Load("stage.jpg");
+	textureHandleStage_ = TextureManager::Load("stage2.jpg");
 	modelStage_ = Model::Create();
-	worldTransformStage_.translation_ = {0, -1.5f, 0};
-	worldTransformStage_.scale_ = {4.5f, 1, 40};
-	worldTransformStage_.Initialize();
+	for (int i = 0; i < STAGE_CUTS; i++) {
+		worldTransformStage_[i].translation_ = {0, -1.5f, 2.0f * i - 5};
+		worldTransformStage_[i].scale_ = {4.5f, 1, 1};
+		worldTransformStage_[i].Initialize();
+	}
 
 	textureHandlePlayer_ = TextureManager::Load("player.png");
 	modelPlayer_ = Model::Create();
@@ -44,14 +46,14 @@ void GameScene::Initialize() {
 
 	textureHnadleBeam_ = TextureManager::Load("beam.png");
 	modelBeam_ = Model::Create();
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < BEAM_MAX; i++) {
 		worldTransformBeam_[i].scale_ = {0.33f, 0.33f, 0.33f};
 		worldTransformBeam_[i].Initialize();
 	}
 
 	textureHandleEnemy_ = TextureManager::Load("enemy.png");
 	modelEnemy_ = Model::Create();
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < ENEMY_MAX; i++) {
 		worldTransformEnemy_[i].scale_ = {0.5f, 0.5f, 0.5f};
 		worldTransformEnemy_[i].Initialize();
 	}
@@ -175,14 +177,16 @@ void GameScene::GamePlayUpdate() {
 	Collision();
 }
 void GameScene::GamePlayDraw3D() {
-	modelStage_->Draw(worldTransformStage_, viewProjection_, textureHandleStage_);
+	for (int i = 0; i < STAGE_CUTS; i++) {
+		modelStage_->Draw(worldTransformStage_[i], viewProjection_, textureHandleStage_);
+	}
 	modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
-	for (int i = 0; i < 10; i++) {
-		if (enemyFlag[i] == 1) {
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		if (enemyFlag[i] != 0) {
 			modelEnemy_->Draw(worldTransformEnemy_[i], viewProjection_, textureHandleEnemy_);
 		}
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < BEAM_MAX; i++) {
 		if (beamFlag[i] == 1) {
 			modelBeam_->Draw(worldTransformBeam_[i], viewProjection_, textureHnadleBeam_);
 		}
@@ -199,15 +203,16 @@ void GameScene::GamePlayDraw2DNear() {
 void GameScene::GamePlayStart() {
 	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformPlayer_.UpdateMatrix();
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < BEAM_MAX; i++) {
 		worldTransformBeam_[i].scale_ = {0.33f, 0.33f, 0.33f};
 		worldTransformBeam_[i].UpdateMatrix();
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < ENEMY_MAX; i++) {
 		enemyFlag[i] = 0;
 		worldTransformEnemy_[i].scale_ = {0.5f, 0.5f, 0.5f};
 		worldTransformEnemy_[i].UpdateMatrix();
 	}
+	gameTime_ = 0;
 	playerLife = 3;
 	gameScore = 0;
 }
@@ -233,13 +238,13 @@ void GameScene::BeamUpdate() {
 	
 	BeamMove();
 	BeamBorn();
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < BEAM_MAX; i++) {
 		worldTransformBeam_[i].UpdateMatrix();
 	}
 }
 
 void GameScene::BeamMove() {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < BEAM_MAX; i++) {
 		if (beamFlag[i] == 1) {
 			worldTransformBeam_[i].translation_.z += 1.0f;
 			worldTransformBeam_[i].rotation_.x += 0.1f;
@@ -252,7 +257,7 @@ void GameScene::BeamMove() {
 
 void GameScene::BeamBorn() {
 	if (input_->PushKey(DIK_SPACE) && beamtimer_ == 0) {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < BEAM_MAX; i++) {
 			if (beamFlag[i] == 0) {
 				worldTransformBeam_[i].translation_.x = worldTransformPlayer_.translation_.x;
 				worldTransformBeam_[i].translation_.z = 0;
@@ -273,19 +278,20 @@ void GameScene::EnemyUpdate() {
 	
 	EnemyMove();
 	EnemyBorn();
-	for (int i = 0; i < 10; i++) {
+	EnemyJump();
+	for (int i = 0; i < ENEMY_MAX; i++) {
 		worldTransformEnemy_[i].UpdateMatrix();
 	}
 }
-
 void GameScene::EnemyMove() {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < ENEMY_MAX; i++) {
 		if (enemyFlag[i] == 1) {
 			worldTransformEnemy_[i].translation_.x += enemySpeed[i];
 			if (abs(worldTransformEnemy_[i].translation_.x) > 5) {
 				enemySpeed[i] *= -1;
 			}
-			worldTransformEnemy_[i].translation_.z -= 0.5f;
+			worldTransformEnemy_[i].translation_.z -= 0.1f;
+			worldTransformEnemy_[i].translation_.z -= gameTime_ / 10000.0f;
 			worldTransformEnemy_[i].rotation_.x -= 0.1f;
 			if (worldTransformEnemy_[i].translation_.z < -5) {
 				enemyFlag[i] = 0;
@@ -293,10 +299,9 @@ void GameScene::EnemyMove() {
 		}
 	}
 }
-
 void GameScene::EnemyBorn() {
 	if (rand() % 10 == 0) {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < ENEMY_MAX; i++) {
 			if (enemyFlag[i] == 0) {
 				int x = rand() % 80;
 				float x2 = (float)x / 10 - 4;
@@ -305,13 +310,34 @@ void GameScene::EnemyBorn() {
 				} else {
 					enemySpeed[i] = 0.2f;
 				}
-				worldTransformEnemy_[i].translation_.x = x2;
-				worldTransformEnemy_[i].translation_.z = 40;
+				worldTransformEnemy_[i].translation_ = {x2, 0, 40};
 				worldTransformEnemy_[i].rotation_.x -= 0;
 				enemyFlag[i] = 1;
 				break;
 			}
 		}
+	}
+}
+void GameScene::EnemyJump() {
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		if (enemyFlag[i] == 2) {
+			worldTransformEnemy_[i].translation_.y += enemyJumpSpeed[i];
+			enemyJumpSpeed[i] -= 0.1f;
+			worldTransformEnemy_[i].translation_.x += enemySpeed[i] * 2;
+			if (worldTransformEnemy_[i].translation_.y < -5) {
+				enemyFlag[i] = 0;
+			}
+		}
+	}
+}
+
+void GameScene::StageUpdate() {
+	for (int i = 0; i < STAGE_CUTS; i++) {
+		worldTransformStage_[i].translation_.z -= 0.1f;
+		if (worldTransformStage_[i].translation_.z < -5) {
+			worldTransformStage_[i].translation_.z += 40;
+		}
+		worldTransformStage_->UpdateMatrix();
 	}
 }
 
@@ -326,7 +352,7 @@ void GameScene::Collision() {
 }
 
 void GameScene::CollisionPlayerEnemy() {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < ENEMY_MAX; i++) {
 		if (enemyFlag[i] == 1) {
 			float dx =
 			  abs(worldTransformPlayer_.translation_.x - worldTransformEnemy_[i].translation_.x);
@@ -342,8 +368,8 @@ void GameScene::CollisionPlayerEnemy() {
 }
 
 void GameScene::CollisionBeamEnemy() {
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		for (int j = 0; j < BEAM_MAX; j++) {
 			if (beamFlag[j] == 1 && enemyFlag[i] == 1) {
 				float dx = abs(
 				  worldTransformBeam_[j].translation_.x - worldTransformEnemy_[i].translation_.x);
@@ -351,7 +377,8 @@ void GameScene::CollisionBeamEnemy() {
 				  worldTransformBeam_[j].translation_.z - worldTransformEnemy_[i].translation_.z);
 				if (dx < 1 && dz < 1) {
 					beamFlag[j] = 0;
-					enemyFlag[i] = 0;
+					enemyFlag[i] = 2;
+					enemyJumpSpeed[i] = 1;
 					gameScore++;
 				}
 			}
