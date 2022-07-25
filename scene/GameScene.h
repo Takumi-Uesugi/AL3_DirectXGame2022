@@ -79,6 +79,13 @@ class GameScene {
 	int gameTime_ = 0;
 	int beamtimer_ = 0;
 
+	uint32_t soundDataHandleTitleBGM_ = 0;
+	uint32_t soundDataHandleGamePlayBGM_ = 0;
+	uint32_t soundDataHandleGameOverBGM_ = 0;
+	uint32_t soundDataHandleEnemyHitSE_ = 0;
+	uint32_t soundDataHandlePlayerHitSE_ = 0;
+	uint32_t voiceHandleBGM_ = 0;
+
 	int playerLife = 3;
 	int gameScore = 0;
 	int beamFlag[10] = {};

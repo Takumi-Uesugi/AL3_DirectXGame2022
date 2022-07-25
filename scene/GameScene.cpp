@@ -63,6 +63,14 @@ void GameScene::Initialize() {
 
 	textureHandleGameover_ = TextureManager::Load("gameover.png");
 	spriteGameover_ = Sprite::Create(textureHandleGameover_, {0, 100});
+
+	soundDataHandleTitleBGM_ = audio_->LoadWave("Audio/Ring05.wav");
+	soundDataHandleGamePlayBGM_ = audio_->LoadWave("Audio/Ring08.wav");
+	soundDataHandleGameOverBGM_ = audio_->LoadWave("Audio/Ring09.wav");
+	soundDataHandleEnemyHitSE_ = audio_->LoadWave("Audio/chord.wav");
+	soundDataHandlePlayerHitSE_ = audio_->LoadWave("Audio/tada.wav");
+
+	voiceHandleBGM_ = audio_->PlayWave(soundDataHandleTitleBGM_, true);
 }
 
 void GameScene::Update() {
@@ -311,6 +319,8 @@ void GameScene::Collision() {
 	CollisionPlayerEnemy();
 	CollisionBeamEnemy();
 	if (playerLife <= 0) {
+		audio_->StopWave(voiceHandleBGM_);
+		voiceHandleBGM_ = audio_->PlayWave(soundDataHandleGameOverBGM_, true);
 		sceneMode_ = 2;
 	}
 }
@@ -325,6 +335,7 @@ void GameScene::CollisionPlayerEnemy() {
 			if (dx < 1 && dz < 1) {
 				enemyFlag[i] = 0;
 				playerLife--;
+				audio_->PlayWave(soundDataHandlePlayerHitSE_);
 			}
 		}
 	}
@@ -351,6 +362,8 @@ void GameScene::CollisionBeamEnemy() {
 void GameScene::TitleUpdate() {
 	if (input_->TriggerKey(DIK_RETURN)) {
 		GamePlayStart();
+		audio_->StopWave(voiceHandleBGM_);
+		voiceHandleBGM_ = audio_->PlayWave(soundDataHandleGamePlayBGM_, true);
 		sceneMode_ = 0;
 	}
 }
@@ -364,6 +377,8 @@ void GameScene::TitleDraw2DNear() {
 
 void GameScene::GameoverUpdate() {
 	if (input_->PushKey(DIK_RETURN)) {
+		audio_->StopWave(voiceHandleBGM_);
+		voiceHandleBGM_ = audio_->PlayWave(soundDataHandleTitleBGM_, true);
 		sceneMode_ = 1;
 	}
 }
