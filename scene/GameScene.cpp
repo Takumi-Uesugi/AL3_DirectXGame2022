@@ -14,6 +14,13 @@ GameScene::~GameScene() {
 	delete modelBeam_;
 	delete modelEnemy_; 
 	delete spriteTitle_;
+	delete spriteScore_;
+	for (int i = 0; i < 3; i++) {
+		delete spriteLife_[i];
+	}
+	for (int i = 0; i < 5; i++) {
+		delete spriteNumBer_[i];
+	}
 }
 
 void GameScene::Initialize() {
@@ -26,6 +33,13 @@ void GameScene::Initialize() {
 
 	textureHandleBG_ = TextureManager::Load("bg.jpg");
 	spriteBG_ = Sprite::Create(textureHandleBG_, {0, 0});
+
+	textureHandleScore_ = TextureManager::Load("score.png");
+	spriteScore_ = Sprite::Create(textureHandleScore_, {150, 0});
+	textureHandleNumber_ = TextureManager::Load("number.png");
+	for (int i = 0; i < 5; i++) {
+		spriteNumBer_[i] = Sprite::Create(textureHandleNumber_, {300.0f + i * 26, 0});
+	}
 
 	viewProjection_.eye = {0, 1, -6};
 	viewProjection_.target = {0, 1, 0};
@@ -43,6 +57,10 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::Create();
 	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformPlayer_.Initialize();
+	for (int i = 0; i < 3; i++) {
+		spriteLife_[i] = Sprite::Create(textureHandlePlayer_, {(float)(800 + 50 * i), 10});
+		spriteLife_[i]->SetSize({40, 40});
+	}
 
 	textureHnadleBeam_ = TextureManager::Load("beam.png");
 	modelBeam_ = Model::Create();
@@ -180,7 +198,9 @@ void GameScene::GamePlayDraw3D() {
 	for (int i = 0; i < STAGE_CUTS; i++) {
 		modelStage_->Draw(worldTransformStage_[i], viewProjection_, textureHandleStage_);
 	}
-	modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+	if (playerTimer_ % 4 <= 2) {
+		modelPlayer_->Draw(worldTransformPlayer_, viewProjection_, textureHandlePlayer_);
+	}
 	for (int i = 0; i < ENEMY_MAX; i++) {
 		if (enemyFlag[i] != 0) {
 			modelEnemy_->Draw(worldTransformEnemy_[i], viewProjection_, textureHandleEnemy_);
@@ -194,11 +214,11 @@ void GameScene::GamePlayDraw3D() {
 }
 void GameScene::GamePlayDraw2DBack() { spriteBG_->Draw(); }
 void GameScene::GamePlayDraw2DNear() {
-	char str[100];
-	sprintf_s(str, "SCORE %d", gameScore);
-	debugText_->Print(str, 200, 10, 2);
-	sprintf_s(str, "LIFE %d", playerLife);
-	debugText_->Print(str, 800, 10, 2);
+	spriteScore_->Draw();
+	DrawScore();
+	for (int i = 0; i < playerLife_; i++) {
+		spriteLife_[i]->Draw();
+	}
 }
 void GameScene::GamePlayStart() {
 	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
@@ -213,8 +233,9 @@ void GameScene::GamePlayStart() {
 		worldTransformEnemy_[i].UpdateMatrix();
 	}
 	gameTime_ = 0;
-	playerLife = 3;
-	gameScore = 0;
+	playerTimer_ = 0;
+	playerLife_ = 3;
+	gameScore_ = 0;
 }
 
 void GameScene::PlayerUpdate() {
@@ -229,6 +250,10 @@ void GameScene::PlayerUpdate() {
 	}
 	if (worldTransformPlayer_.translation_.x < -4.0f) {
 		worldTransformPlayer_.translation_.x = -4.0f;
+	}
+
+	if (playerTimer_ > 0) {
+		playerTimer_--;
 	}
 
 	worldTransformPlayer_.UpdateMatrix();
@@ -341,10 +366,25 @@ void GameScene::StageUpdate() {
 	}
 }
 
+void GameScene::DrawScore() {
+	char eachNumber[5] = {};
+	int number = gameScore_;
+
+	int keta = 10000;
+	for (int i = 0; i < 5; i++) {
+		eachNumber[i] = number / keta;
+		number %= keta;
+		keta /= 10;
+		spriteNumBer_[i]->SetSize({32, 64});
+		spriteNumBer_[i]->SetTextureRect({32.0f * eachNumber[i], 0}, {32, 64});
+		spriteNumBer_[i]->Draw();
+	}
+}
+
 void GameScene::Collision() {
 	CollisionPlayerEnemy();
 	CollisionBeamEnemy();
-	if (playerLife <= 0) {
+	if (playerLife_ <= 0) {
 		audio_->StopWave(voiceHandleBGM_);
 		voiceHandleBGM_ = audio_->PlayWave(soundDataHandleGameOverBGM_, true);
 		sceneMode_ = 2;
@@ -360,7 +400,8 @@ void GameScene::CollisionPlayerEnemy() {
 			  abs(worldTransformPlayer_.translation_.z - worldTransformEnemy_[i].translation_.z);
 			if (dx < 1 && dz < 1) {
 				enemyFlag[i] = 0;
-				playerLife--;
+				playerLife_--;
+				playerTimer_ = 60;
 				audio_->PlayWave(soundDataHandlePlayerHitSE_);
 			}
 		}
@@ -379,7 +420,7 @@ void GameScene::CollisionBeamEnemy() {
 					beamFlag[j] = 0;
 					enemyFlag[i] = 2;
 					enemyJumpSpeed[i] = 1;
-					gameScore++;
+					gameScore_++;
 				}
 			}
 		}

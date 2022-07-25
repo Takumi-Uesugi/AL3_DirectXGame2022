@@ -53,6 +53,8 @@ class GameScene {
 	void EnemyJump();
 	void StageUpdate();
 
+	void DrawScore();
+
 	void Collision();
 	void CollisionPlayerEnemy();
 	void CollisionBeamEnemy();
@@ -84,18 +86,30 @@ class GameScene {
 	int sceneMode_ = 1;
 	int gameTime_ = 0;
 	int beamtimer_ = 0;
-
-	int playerLife = 3;
-	int gameScore = 0;
+	int playerLife_ = 3;
+	int playerTimer_ = 0;
+	int gameScore_ = 0;
 	int beamFlag[10] = {};
 	int enemyFlag[10] = {};
 	float enemySpeed[10] = {};
 	float enemyJumpSpeed[10] = {};
 
+	ViewProjection viewProjection_;
+
 	uint32_t textureHandleBG_ = 0;
 	Sprite* spriteBG_ = nullptr;
 
-	ViewProjection viewProjection_;
+	uint32_t textureHandleScore_ = 0;
+	Sprite* spriteScore_ = nullptr;
+	uint32_t textureHandleNumber_ = 0;
+	Sprite* spriteNumBer_[5] = {};
+
+	uint32_t textureHandleTitle_ = 0;
+	Sprite* spriteTitle_ = nullptr;
+	uint32_t textureHandleEnter_ = 0;
+	Sprite* spriteEnter_ = nullptr;
+	uint32_t textureHandleGameover_ = 0;
+	Sprite* spriteGameover_ = nullptr;
 
 	uint32_t textureHandleStage_ = 0;
 	Model* modelStage_ = nullptr;
@@ -104,6 +118,7 @@ class GameScene {
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;
+	Sprite* spriteLife_[3] = {};
 
 	uint32_t textureHnadleBeam_ = 0;
 	Model* modelBeam_ = nullptr;
@@ -112,13 +127,6 @@ class GameScene {
 	uint32_t textureHandleEnemy_ = 0;
 	Model* modelEnemy_ = nullptr;
 	WorldTransform worldTransformEnemy_[10];
-
-	uint32_t textureHandleTitle_ = 0;
-	Sprite* spriteTitle_ = nullptr;
-	uint32_t textureHandleEnter_ = 0;
-	Sprite* spriteEnter_ = nullptr;
-	uint32_t textureHandleGameover_ = 0;
-	Sprite* spriteGameover_ = nullptr;
 
 	uint32_t soundDataHandleTitleBGM_ = 0;
 	uint32_t soundDataHandleGamePlayBGM_ = 0;
